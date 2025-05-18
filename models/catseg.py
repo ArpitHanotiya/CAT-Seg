@@ -1,6 +1,8 @@
+import clip  # Add this import
 import torch
 import torch.nn as nn
 from .clip_adapter import build_clip_adapter
+from datasets import CLASS_NAMES  # Import CLASS_NAMES
 
 class CATSeg(nn.Module):
     def __init__(self, 
@@ -16,7 +18,7 @@ class CATSeg(nn.Module):
         )
         
         # Text Encoder (frozen CLIP text encoder)
-        self.text_encoder = clip.load(clip_model)[1]
+        self.text_encoder = clip.load(clip_model)[1]  # Now "clip" is defined
         for param in self.text_encoder.parameters():
             param.requires_grad = False
             
@@ -33,7 +35,11 @@ class CATSeg(nn.Module):
         return torch.einsum('bchw,nc->bnhw', image_embeds, text_embeds)
         
     def forward(self, x):
-        # x shape: [B, C, H, W] (C=10 for PASTIS)
+        # Use imported CLASS_NAMES
+        text_tokens = self.text_encoder(CLASS_NAMES)  # CLASS_NAMES is now defined
+        text_embeddings = text_tokens / text_tokens.norm(dim=-1, keepdim=True)
+        
+        # Rest of the code remains the same...
         
         # Image embeddings
         image_embeddings = self.clip_adapter(x)  # [B, embed_dim, h, w]
