@@ -11,20 +11,20 @@ class CATSeg(nn.Module):
                  input_channels=10):
         super().__init__()
         
-        # CLIP Adapter for 10-channel input
+        # CLIP Adapter
         self.clip_adapter = build_clip_adapter(
             input_channels=input_channels,
             clip_model=clip_model
         )
         
-        # Load CLIP model and freeze parameters
+        # CLIP Model (frozen)
         self.clip_model, _ = clip.load(clip_model)
         for param in self.clip_model.parameters():
             param.requires_grad = False
             
         # Segmentation Head
         self.head = nn.Conv2d(
-            in_channels=self.clip_adapter.embed_dim,
+            in_channels=self.clip_adapter.embed_dim,  # Now accessible
             out_channels=num_classes,
             kernel_size=1
         )
@@ -38,8 +38,8 @@ class CATSeg(nn.Module):
         # Image embeddings
         image_embeddings = self.clip_adapter(x)  # [B, embed_dim, h, w]
         
-        # Text embeddings (tokenize CLASS_NAMES)
-        text_tokens = clip.tokenize(CLASS_NAMES).to(x.device)  # Tokenize text
+        # Text embeddings
+        text_tokens = clip.tokenize(CLASS_NAMES).to(x.device)
         text_embeddings = self.clip_model.encode_text(text_tokens)
         text_embeddings = text_embeddings / text_embeddings.norm(dim=-1, keepdim=True)
         
