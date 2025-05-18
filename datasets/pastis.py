@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 
 class PASTISDataset(Dataset):
     def __init__(self, root, split='train', temporal_mode='mean'):
-        self.root = os.path.join(root, "PASTIS")  # Add "PASTIS" subdirectory
+        self.root = root # os.path.join(root, "PASTIS")  # Add "PASTIS" subdirectory
         self.split = split
         self.temporal_mode = temporal_mode
         
