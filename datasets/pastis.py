@@ -5,15 +5,24 @@ from torch.utils.data import Dataset
 
 class PASTISDataset(Dataset):
     def __init__(self, root, split='train', temporal_mode='mean'):
-        self.root = root
+        self.root = os.path.join(root, "PASTIS")  # Add "PASTIS" subdirectory
         self.split = split
-        self.temporal_mode = temporal_mode  # 'mean' or 'stack'
-        self.sits_dir = os.path.join(root, split, 'S2')
-        self.mask_dir = os.path.join(root, split, 'ANNOTATIONS')
+        self.temporal_mode = temporal_mode
+        
+        # Correct paths to match Kaggle structure
+        self.sits_dir = os.path.join(self.root, "DATA_S2")  # Changed from S2 to DATA_S2
+        self.mask_dir = os.path.join(self.root, "ANNOTATIONS")
+        
+        # Verify paths
+        if not os.path.exists(self.sits_dir):
+            raise FileNotFoundError(f"SITS dir missing: {self.sits_dir}")
+        if not os.path.exists(self.mask_dir):
+            raise FileNotFoundError(f"Mask dir missing: {self.mask_dir}")
 
-        # List all samples
+        # List samples
         self.samples = [f for f in os.listdir(self.sits_dir) if f.endswith('.npy')]
 
+    # Rest of the code remains the same...
     def __len__(self):
         return len(self.samples)
 
