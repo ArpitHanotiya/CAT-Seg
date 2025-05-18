@@ -1,0 +1,15 @@
+dataset:
+  name: 'pastis'
+  root: '/path/to/PASTIS'
+  split: 'train'
+  temporal_mode: 'mean'  # or 'stack'
+
+model:
+  clip_model: 'ViT-B/16'
+  input_channels: 10
+  num_classes: 19
+
+training:
+  batch_size: 8
+  lr: 1e-4
+  epochs: 50
