@@ -2,6 +2,13 @@ import torch
 from datasets import get_dataset
 from models.catseg import CATSeg
 
+# Replace relative imports with absolute paths
+import sys
+sys.path.append("/kaggle/working/CAT-Seg")  # Add this line
+
+from models.catseg import CATSeg
+from datasets import get_dataset
+
 # Load config
 config = load_yaml('configs/pastis.yaml')
 
