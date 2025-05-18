@@ -1,13 +1,13 @@
 import torch
+import yaml  # Add this import
+from torch.utils.data import DataLoader  # Add this import
 from datasets import get_dataset
 from models.catseg import CATSeg
 
-# Replace relative imports with absolute paths
-import sys
-sys.path.append("/kaggle/working/CAT-Seg")  # Add this line
-
-from models.catseg import CATSeg
-from datasets import get_dataset
+def load_yaml(path):
+    """Load YAML config file"""
+    with open(path, 'r') as f:
+        return yaml.safe_load(f)
 
 # Load config
 config = load_yaml('configs/pastis.yaml')
@@ -19,14 +19,18 @@ train_dataset = get_dataset(
     split='train',
     temporal_mode=config['dataset']['temporal_mode']
 )
-train_loader = DataLoader(train_dataset, batch_size=config['training']['batch_size'])
+train_loader = DataLoader(
+    train_dataset, 
+    batch_size=config['training']['batch_size'],
+    shuffle=True
+)
 
 # Model
 model = CATSeg(
     clip_model=config['model']['clip_model'],
     num_classes=config['model']['num_classes'],
     input_channels=config['model']['input_channels']
-)
+).cuda()
 
 # Loss and optimizer
 criterion = torch.nn.CrossEntropyLoss(ignore_index=255)
@@ -34,8 +38,17 @@ optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['lr'])
 
 # Training loop
 for epoch in range(config['training']['epochs']):
+    model.train()
     for images, masks in train_loader:
+        images, masks = images.cuda(), masks.cuda()
+        
+        # Forward
         outputs = model(images)
         loss = criterion(outputs, masks)
+        
+        # Backward
+        optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        
+    print(f"Epoch {epoch+1}/{config['training']['epochs']} | Loss: {loss.item():.4f}")
