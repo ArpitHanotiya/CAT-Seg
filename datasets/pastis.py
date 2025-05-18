@@ -37,7 +37,7 @@ class PASTISDataset(Dataset):
         sits = np.load(sits_path)  # [T, 10, 128, 128]
 
         # Load corresponding mask
-        mask_fname = self.samples[idx].replace("S2", "mask")
+        mask_fname = self.samples[idx].lower().replace("s2", "mask")
         mask_path = os.path.join(self.mask_dir, mask_fname)
         mask = np.load(mask_path).astype(np.int64)  # [128, 128]
 
