@@ -11,18 +11,20 @@ def load_yaml(path):
 
 # Load config
 config = load_yaml('configs/pastis.yaml')
-
-# Dataset
+# Replace this:
 train_dataset = get_dataset(
     name=config['dataset']['name'],
     root=config['dataset']['root'],
     split='train',
     temporal_mode=config['dataset']['temporal_mode']
 )
-train_loader = DataLoader(
-    train_dataset, 
-    batch_size=config['training']['batch_size'],
-    shuffle=True
+
+# With this (directly specify parameters):
+train_dataset = get_dataset(
+    dataset_name="pastis",  # Hardcode dataset name
+    root="/kaggle/input/pastis-dataset-ddp/PASTIS",
+    split="train",
+    temporal_mode="mean"  # or "stack"
 )
 
 # Model
