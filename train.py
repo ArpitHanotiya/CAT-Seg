@@ -1,3 +1,8 @@
+import sys
+sys.path.append("/kaggle/working/CAT-Seg")  # Add project directory to Python path
+
+from datasets import get_dataset  # Now this should work
+
 import torch
 import yaml
 from torch.utils.data import DataLoader
