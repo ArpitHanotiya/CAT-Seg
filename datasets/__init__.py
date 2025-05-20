@@ -7,9 +7,8 @@ CLASS_NAMES = [
 ]
 NUM_CLASSES = len(CLASS_NAMES)
 
-
 def get_dataset(dataset_name, **kwargs):
-    if dataset_name == "pastis":
+    if dataset_name == 'pastis':
         return PASTISDataset(**kwargs)
     else:
         raise ValueError(f"Unknown dataset: {dataset_name}")
