@@ -9,9 +9,9 @@ class PASTISDataset(Dataset):
         self.split = split
         self.temporal_mode = temporal_mode
         
-        # Dataset paths
+        # Dataset paths (UPDATED MASK DIRECTORY)
         self.sits_dir = os.path.join(self.root, "DATA_S2")
-        self.mask_dir = os.path.join(self.root, "ANNOTATIONS")
+        self.mask_dir = os.path.join(self.root, "ANNOTATIONS", "INSTANCE_ANNOTATIONS")  # Changed
         
         # Verify paths exist
         if not os.path.exists(self.sits_dir):
@@ -19,12 +19,13 @@ class PASTISDataset(Dataset):
         if not os.path.exists(self.mask_dir):
             raise FileNotFoundError(f"Mask directory missing: {self.mask_dir}")
 
-        # Get all S2 samples
+        # Get all S2 samples (UPDATED FILENAME HANDLING)
         self.samples = [f for f in os.listdir(self.sits_dir) if f.endswith('.npy')]
         
-        # Verify samples have corresponding masks
+        # Verify samples have corresponding masks (FIXED MASK PATH CONSTRUCTION)
         for fname in self.samples:
-            mask_path = os.path.join(self.mask_dir, fname.replace("S2", "mask"))
+            mask_fname = fname.replace("S2", "mask").replace("s2", "mask")  # Case-insensitive
+            mask_path = os.path.join(self.mask_dir, mask_fname)
             if not os.path.exists(mask_path):
                 raise FileNotFoundError(f"Mask file missing: {mask_path}")
 
@@ -36,8 +37,8 @@ class PASTISDataset(Dataset):
         sits_path = os.path.join(self.sits_dir, self.samples[idx])
         sits = np.load(sits_path)  # [T, 10, 128, 128]
 
-        # Load corresponding mask
-        mask_fname = self.samples[idx].lower().replace("s2", "mask")
+        # Load corresponding mask (FIXED MASK PATH)
+        mask_fname = self.samples[idx].replace("S2", "mask").replace("s2", "mask")
         mask_path = os.path.join(self.mask_dir, mask_fname)
         mask = np.load(mask_path).astype(np.int64)  # [128, 128]
 
